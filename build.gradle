@@ -11,6 +11,9 @@ apply plugin: 'java-library'
 
 apply plugin: 'jacoco'
 
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 // In this section you declare where to find the dependencies of your project
 repositories {
     jcenter()
@@ -39,9 +42,19 @@ jacocoTestCoverageVerification {
     }
 }
 
+task run(type: JavaExec, dependsOn: classes) {
+    main = 'eth.ent.identity.server.IdentityManagerServer'
+    classpath sourceSets.main.runtimeClasspath
+    classpath configurations.compile
+}
+
 dependencies {
 
-    testCompile "org.mockito:mockito-core:2.+"
+	compile 'com.sparkjava:spark-core:2.7+'
+	compile 'com.google.code.gson:gson:2.8+'
+	compile 'org.slf4j:slf4j-simple:1.7+'
+
+	testCompile "org.mockito:mockito-core:2.+"
     
     testImplementation 'junit:junit:4.12'
  
