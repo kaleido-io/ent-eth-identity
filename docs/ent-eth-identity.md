@@ -98,12 +98,13 @@ All nodes **should** have TLS with their applications, and **may** choose to use
 
 As well as maintaining a copy of a ledger, nodes are the gateways by which external transactions are submitted into the network. Nodes **can** expose both IPC and Network interfaces for the submission of transactions into the network.
 
-#### Node Accounts
+##### Externally Owned Accounts Managed by Nodes
 
 Nodes **may** hold the private keys of multiple Ethereum accounts, in order to sign transactions that are submitted over a network interface to that node. For example an application connecting over JSON/RPC to a node **can** submit a transaction to create a smart contract, or send data to an existing smart contract, without first having signed that transaction. The node **can** then sign the transaction using a private key the node has access to, that the application sending the transaction does not have access to.
 
 As such the node **can** provide a point of identity aggregation and/or masking, where multiple external identities are able to submit transactions into the network that result in the use of the same ethereum account.
 
+[**Suggest removing this section, smart contract isn't a good place to hold indentities as it's distributed as a shared component among participants**]
 ### Smart Contracts
 
 Once deployed a smart contract is assigned an ethereum account address, which **can** be linked to an identity via the approaches discussed in this document. Smart contracts can then submit transactions to other smart contracts, and can use state to prevent access to the smart contract from unauthenticated addresses, as long as the state required to establish the identity of the transaction submitter is available on the blockchain.
