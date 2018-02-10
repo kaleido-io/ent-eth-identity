@@ -13,11 +13,15 @@ Replaces (*optional): N/A
 
 # Identity and Permissioning
 
-Identity is critical to a permissioned Enterprise Ethereum network. Every organization within the network must be able to establish the identity of other entities in the network. The entities that require identities are varied and elaborated in this document, including nodes and other infrastructure components, applications, individuals, and most critically the organizations that participate in the consortium.
+Identity is critical to a permissioned Enterprise Ethereum network. Every entity within the network must be able to establish the identity of other entities in the network. The entities that require identities are varied and elaborated in this document, including nodes and other infrastructure components, applications, individuals, and most critically the organizations that participate in the consortium.
 
-There are circumstances where masking of identity is also required within a permissioned network, and where data must be transferred privately between participants.
+Network membership permissioning should work at the organizational level. An organization gets added to the network membership management and establishes its trust anchor. Then the organization can freely add or remove individual identities belonging to it.
 
-The standard in this document describes a set of identity and permissioning requirements that an Enterprise Ethereum solution **shall** meet, and an example architecture for establishing identity via an interface that could be implemented independently is multiple Enterprise Ethereum implementations,or shared as a pluggable component.
+There are circumstances where masking of identity is required in shared transaction data, such that the transaction participants are not revealed to non-participants of the transaction.
+
+In still other circumstances, transaction data must be transferred privately between participants.
+
+The standard in this document describes a set of identity and permissioning requirements that an Enterprise Ethereum solution **shall** meet, and an example architecture for establishing identity via an interface that could be implemented independently as multiple Enterprise Ethereum implementations, or shared as a pluggable component.
 
 ## Index
 
@@ -48,33 +52,47 @@ The standard in this document describes a set of identity and permissioning requ
    1. Smart Contract Creation
 1. Identity Manager Component 
 
-## Types of Identity
+## Types of Identities
 
-Entities that exist within an Enterprise Ethereum network that require identity include the following.
+Entities that exist within an Enterprise Ethereum network can be largely categorized as **Individual** and **Organizational** identities. An organizational identity is a collection of individual identities that are endorsed by a trusted authority that can vouch for the validity of the individual identity's organizational association. Different kinds of endorsement by the trusted authority will be described in details.
 
 ### Organizations
 
-An permissioned Enterprise Ethereum network exists to provide a shared ledger between a consortium of organizations. The organizations that are participants in the network **shall** be identifiable to all other organizations in the network, and **shall** be able to prove their ownership of technical components with identities that **can** be created within the network.
+A permissioned Enterprise Ethereum network exists to provide a shared ledger between a consortium of organizations. The organizations that are participants in the network **shall** be identifiable to all other organizations in the network, and **shall** be able to prove their ownership of technical components with identities that **can** be created within the network.
 
-There **can** be cases where anonymous entities are given permission to submit transactions and data into the network, without first establishing an identity within that network. A choice to allow anonymous participation in a permissioned network has significant implications beyond the scope of what is covered in this document.
+Organizations **must** provide a way to establish the identity of other entities that they own, a.k.a a **trust anchor**, via some hierarchical system of trust as discussed later in this document.
 
-Organizations **should** be trusted to establish the identity of other entities that they own, via some hierarchical system of trust as discussed later in this document.
+Organizations **will** be held accountable for the actions of the individual identities that are endorsed by the organization's trust anchor.
 
-Organizations **should** be trusted to appropriately secure ingress into and out of the ethereum network.
+Organizations **should** appropriately secure ingress into and out of the ethereum network. But every node in the network **must always** validate incoming requests from other nodes via the p2p network based on the permissioning mechanism.
 
-### Ethereum Accounts
+[**To be discussed further**] There **can** be cases where anonymous entities are given permission to submit transactions and data into the network, without first establishing an identity within that network. A choice to allow anonymous participation in a permissioned network has significant implications beyond the scope of what is covered in this document.
 
-The only proof of identity available that **may** sign transactions in the Ethereum blockchain **shall** be an ethereum account. In itself an ethereum account does not represent any form of identity. It is an address where asymmetric cryptography **shall** ensure only the holder of the associated private key is able to submit transactions from that address. In order to establish the identity associated with an account, some commonly agreed root of trust **shall** be established between all participants in the network.
+### Individuals
+
+An individual identity in an Enterprise Ethereum network represents a member of an organization. In the context of today's cryptography, an individual identity is a key pair, or [an ethereum Externally Owned Account](https://github.com/ethereum/wiki/wiki/White-Paper#ethereum-accounts). It is used for digital signing and encryption purposes. An organization does not hold keys itself but instead designate individual identities as members who then hold the keys. An organization can designate certain individuals to have special roles that are established in the consortium, such as a blockchain administrator of the organization, which may be required to carry out certain highly privileged operations such as inviting other organizations or accepting an invitation on behalf of the organization.
+
+Roles can be established using identity attributes, which will be discussed in more details.
+
+An individual identity proves its organizations association through the endorsement of the trust anchor. The form of the proof is dependent on the trust system employed by the network. For example, if the network uses Public Key Infrastructure (PKI) then the proof is presented in the form of a public certificate signed by the organization's Certificate Authority (CA). The organization's CA must have been established as a trust anchor in the network apriori.
+
+. In itself an ethereum account does not represent any form of identity. It is an address where asymmetric cryptography **shall** ensure only the holder of the associated private key is able to submit transactions from that address. In order to establish the identity associated with an account, some commonly agreed root of trust **shall** be established between all participants in the network.
 
 A number of approaches to establishing identities, and linking an identity to an ethereum account are discussed later in this document.
+
+## Technical Components Holding Identities
+
+Now we discuss where identities must exist for an Enterprise Ethereum network to function.
 
 ### Nodes
 
 A node is an independently maintained instance of a transaction ledger, that **can** participate in establishing consensus to add a block to the shared ledger. Individual nodes **need not** participate in establishing consensus of every block, and some nodes **may** act in an observer role validating transactions and adding them to the chain, without ever participating in consensus.
 
-All nodes **shall** be permissioned in an Enterprise Ethereum network, regardless of whether they participate in forming consensus.
+All nodes **should** be permissioned in an Enterprise Ethereum network by proving its organizational association. In other words, an organization that has established its trust anchor can freely add any number of nodes, so long as the nodes' identities are properly endorsed.
 
-All node **should** have security in the form encryption and access control applied to all network interfaces, both for communication with applications and communication with other nodes in the network.
+All nodes **must** have security in the form of encryption (TLS) and access control (digital signature based) applied to all network interfaces for communication with other nodes in the network.
+
+All nodes **should** have TLS with their applications, and **may** choose to use access control based on digital signatures or other means of authentication such as OAuth.
 
 > The relationship between organization and node identities, and the formation of consensus for mining new blocks is discussed later in this document.
 
