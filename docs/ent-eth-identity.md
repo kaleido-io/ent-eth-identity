@@ -117,7 +117,7 @@ In a permissioned Enterprise Ethereum network with a private transaction manager
 
 ### Decentralized Applications (DApps)
 
-Decentralized applications (DApps) are the combination of multiple application instances that **may** be implemented and/or hosted by different Organizations, and a set of smart contracts with well defined programming interfaces that hold common state. Assigning an identity to the overall decentralized application is beyond the the scope of this document. However, the individual application instances and smart contracts that participate in the overall DApp are considered.
+Decentralized applications (DApps) are the combination of multiple application instances that **may** be implemented and/or hosted by different organizations, and a set of smart contracts with well defined programming interfaces that hold common state. Assigning an identity to the overall decentralized application is beyond the the scope of this document. However, the individual application instances and smart contracts that participate in the overall DApp are considered.
 
 ### Application Instances
 
@@ -134,10 +134,10 @@ Application instances **may** manage multiple identities, and either propagate o
 - Aggregated identities
   - Such as exploiting existing enterprise identity registries such as LDAP to establish membership of a particular business unit/function, and submitting transactions under accounts linked to an identity for that business unit/function
 - Identity of the application itself to connect to a node
-  - The application **should** scaled and hosted separately from the node, and as such network security such as TLS mutual authentication, OAuth 2.0, API keys, or HTTPS basic authentication **shall** be used when the application connects to the node
+  - The application **should** be scaled and hosted separately from the node, and as such network security such as TLS mutual authentication, OAuth 2.0, API keys, or HTTPS basic authentication **shall** be used when the application connects to the node
   - If the application instance is colocated with the node, then operating system security **can** be used to establish application identity
 
-Application instances **may** be owned by the same organization as the nodes it uses to connect to the network, so that other participants in the network **can** can isolate that application from the network by removing the organization's nodes in the case of a technical or security failure, without requiring access to the IT infrastructure upon which the application itself executes.
+Application instances **may** be owned by the same organization as the nodes it uses to connect to the network, so that other participants in the network **can** isolate that application from the network by evicting the organization's nodes in the case of a technical or security failure, or business decision, without requiring access to the IT infrastructure upon which the application itself executes.
 
 ### Shared Applications
 
@@ -145,23 +145,27 @@ Application instances **may** have responsibilities that are required by multipl
 
 In environments where such an application instance exists, a mechanism **should** be in place to provide trust to all parties involved in the consortium that the code executed in that shared application instance is the code that has been agreed. As the ethereum network cannot be exploited to provide that trust, some other mechanism must be employed.
 
-#### Trusted Execution Environments
+##### Trusted Execution Environments
 
-One mechanism that **can** be employed to provide assurance as to the code being executed in a shared application instance hosted by any party, is a cryptographically secured compute environment that can be traced back to a set of executable source code reviewed by all parties involved in the consortium.
+One mechanism that **can** be employed to provide assurance as to the code being executed in a shared application instance hosted by any party, is a cryptographically secured compute environment that can be traced back to a set of executable source code reviewed by all parties involved in the consortium. In general such mechanisms provides trust via remote attestation, such as in the case of Intel SGX.
 
-#### Independent Third Parties
+##### Independent Third Parties
 
 Alternatively a third party can be trusted to host the shared application instance. This third party **may** be a neutral participant in the business consortium, such as a regulator or other independent entity. Or it **may** be an external entity trusted by the consortium.
 
 ### End Users
 
-Individual end-user identities **may** be managed by the application instances that they connect to, in the case that those individuals trusts the organization that hosts that application.
+Individual end-user identities **may** be managed by the application instances that they connect to, in the case that those individuals trust the organization that hosts that application.
 
 For example, customers **may** trust the organization hosting that application to manage their identity directly, or indirectly via a system such as OAuth 2.0 with a 3rd party identity provider.
 
 Employee identities **may** be managed on behalf of end-users using traditional enterprise user registries such as a LDAP and mapped to one or many ethereum accounts as part of the application instance. Or ethereum identities might be managed automatically on a users behalf by linking an enterprise process for employee on-boarding, to a deterministic wallet managing those keys on the users behalf.
 
 End-users **may** instead be empowered to manage their own identities, via an application that lets them secure their private keys on devices such as computers and mobile phones, with appropriate security controls.
+
+### Devices
+
+In an IoT world, devices can be an important part of a blockchain based solution. Devices acquire identities similarly to applications, by either hosting the keys locally, such that all the transactions it emits are signed, or by authenticating with a gateway computer via other means (Basic Auth, OAuth, API Keys, etc.) and have the gateway sign the transactions on its behalf. Techniques to use to secure the devices and secure the communications with the blockchain is similar to that of the end users.
 
 ## Establishing Identity
 
