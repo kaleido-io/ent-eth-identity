@@ -173,7 +173,7 @@ In order for an identity to be established within a permissioned network, there 
 
 ### Domains of Trust
 
-It **need not** be the case that every type of identity described in this document is verifiable by every organization participant in the network. Depending on the use case trust **may** be delegated within a domain. For example, an organization **may** be trusted to authenticate the identity of its employees that access an instance of its decentralized applications, via existing enterprise identity registry.
+It **need not** be the case that every type of identity described in this document is verifiable by every organization participant in the network. Depending on the use case trust **may** be delegated within a domain. For example, an organization **must** be held accountable to authenticate, and indeed endorse with legality, the identity of its employees that access an instance of its decentralized applications.
 
 It **should** be the case that organizations are able to efficiently manage their own resources, including in the case where the identity of those resources need to be established by other resources in the network. Commonly an inheritance of trust is employed for this purpose, where organizations have a domain of trust within which they are empowered to create new identities.
 
@@ -181,29 +181,30 @@ For example, an organization **may** be empowered to create new nodes owned by t
 
 ### Trust Anchors
 
-In order to allow components within the network to establish the identity of other components within the network, there **shall** be a set of trust anchors that components owned by every participant in the network **can** use to validate the identity as trusted within the network.
+In order to allow components within the network to establish the identity of other components within the network, there **must** be a set of trust anchors that components in the network **can** use to validate the identity as trusted within the network.
 
-#### Public Key Infrastructure (PKI)
+##### Public Key Infrastructure (PKI)
 
-PKI is well established as the trust anchor of the internet, with a well known set of root authorities able to provide a trust anchor in a hierarchical model. These trusted root CAs **may** be used to validate the organizational identity, and issue an intermediate certificate. This intermediate certificate can be used by that organization to sign certificates for the individual resources it owns. The chain of signing of a certificate, combined with standardization on the generation of fields in the Common Name (CN) can be used to tie the individual identity of an entity, to the identity of the organization that created that entity.
+PKI is well established as the trust mechanism of the internet, with a well-known set of root authorities able to provide a trust anchor in a hierarchical model. These trusted root CAs **may** be used to validate the organizational identity, and issue an intermediate certificate. This intermediate certificate can be used by that organization to sign certificates for the individual resources it owns. The chain of signing of a certificate, combined with standardization on the generation of fields in the Common Name (CN) can be used to tie the individual identity of an entity, to the identity of the organization that created that entity.
 
 Private Certificate Authorities **may** also be used in such an environment. For example, by having a single root certificate generated for each organization and distributed via a trusted delivery mechanism to each participant.
 
 If a suitable third party exists who's identity **can** be trusted by all parties, then that third party **may** act as a root certificate authority for the network. Thus eliminating the need to distribute the organizational intermediate certificates to each party in the network.
 
-#### Oracles
+##### Oracles
 
+[**why would this be a problem? validating a certiciate can always be done deterministically in a distributed system. May need to discuss this a bit more**]
 The decentralized nature of the ethereum ecosystem, and permissioned ethereum networks, **may** make the approach of exploiting the existing trusted certificate authorities in the centralized PKI infrastructure unsuitable for some networks. In these cases a decentralized hierarchy of identity could be managed either on the permissioned chain itself, or in the public ethereum ecosystem.
 
 In such a system x.509 certificates **can** continue to be used as the technology for encoding and signing identity, while the certificate authorities are replaced with Smart Contracts that govern the lifecycle of trust of those certificates.
 
 ### Trust on First Use (TOFU)
 
-A fully decentralized approach to security in permissioned ethereum network **may** by appropriate, particularly in networks that need a low barrier of entry to new participants. TOFU **can** provide a decentralized solution, delegating responsibility for validation of a new identity out to the existing members of the network.
+A fully decentralized approach to security in permissioned ethereum network **may** be appropriate, particularly in networks that need a low barrier of entry to new participants. TOFU **can** provide a decentralized solution, delegating responsibility for validation of a new identity out to the existing members of the network.
 
 Given the example of a new node joining a network, that node would attempt to connect to a number of existing nodes using an identity token. This action would result in some administrative prompt to administrators of those nodes to choose whether to accept that identity token. Administrators would need to use out-of-band communications mechanisms to ascertain whether the new node is expected, and maybe supporting technical details such as the originating IP address. 
 
-Once accepted by that node, the node **shall** persist details of the new node and beginning accepting and forwarding p2p communication to that node. If any change is detected in the identity token being used then connections are rejected.
+Once accepted by that node, the node **shall** persist details of the new node and begin accepting and forwarding p2p communication to that node. If any change is detected in the identity token, or digital signature on the incoming messages, being used then connections are rejected.
 
 All nodes receiving direct or indirect p2p communication with that node would perform the same TOFU validation. Depending on the consensus algorithm used within the network, the new node **should** not be able to mine new blocks until it has convinced a suitable proportion of existing nodes to accept its identity.
 
@@ -213,7 +214,7 @@ TOFU **can** be enhanced by exploiting the ethereum ledger to track the votes of
 
 ### Hierarchical Deterministic (HD) Wallets
 
-HD Wallets **may** be used to managing large quantities of identities that have a one-to-one relationship with an ethereum account, such as employees within a company. An arbitrary number of accounts can be generated and distributed to employees, and all of these keys can be used to submit transactions through the application instances and nodes owned by that organization.
+HD Wallets **may** be used to manage large quantities of identities that have a one-to-one relationship with an ethereum account, such as employees within a company. An arbitrary number of accounts can be generated and distributed to employees, and all of these keys can be used to submit transactions through the application instances and nodes owned by that organization.
 
 In order for other participants in a network to validate an account is owned by an organizational identity, an organization **may** provide an off-chain network interface to validate an account using its HD Wallet.
 
