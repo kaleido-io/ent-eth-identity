@@ -1,7 +1,7 @@
 ```
 EEP: TBC
 Title: EEA Identity and Permissioning
-Version: 0.1
+Version: 0.2
 Author: Peter Broadhurst, Jim Zhang
 Type: EEA Standard
 Status: Draft
@@ -13,48 +13,66 @@ Replaces (*optional): N/A
 
 # Identity and Permissioning
 
-Identity is critical to a permissioned Enterprise Ethereum network. Every entity within the network must be able to establish the identity of other entities in the network. The entities that require identities are varied and elaborated in this document, including nodes and other infrastructure components, applications, individuals, and most critically the organizations that participate in the consortium.
+Identity is critical to a permissioned Enterprise Ethereum network. Every component and organization within the network must establish its identity with the other entities in the network. The required types of identities are elaborated in this document, including nodes and other infrastructure components, applications, individuals, and most critically the organizations that participate in the consortium.
 
-Network membership permissioning should work at the organizational level. An organization gets added to the network membership management and establishes its trust anchor. Then the organization can freely add or remove individual identities belonging to it.
+Network membership permissioning **shall** work at the organizational level. To join the network an organization needs to be added to the network membership management and establish a trust anchor. Then the organization can freely add or remove individual identities belonging to it, although it **may** be required to conform to policies agreed within then network when it does so.
 
 There are circumstances where masking of identity is required in shared transaction data, such that the transaction participants are not revealed to non-participants of the transaction.
 
-In still other circumstances, transaction data must be transferred privately between participants.
+In still other circumstances, transaction data **shall** be transferred privately between participant organizations. Each organization **may** participate in separate bilateral or multilateral private transactions with other organizations, and each organization **should** own multiple nodes in the network. The details of private transaction management are to be covered in other specification documents, building upon the organization and node identity constructs described in this document.
 
 The standard in this document describes a set of identity and permissioning requirements that an Enterprise Ethereum solution **shall** meet, and an example architecture for establishing identity via an interface that could be implemented independently as multiple Enterprise Ethereum implementations, or shared as a pluggable component.
 
-## Index
+## Table of Contents
 
-1. Types of Identity
-   1. Individual Identity
-   1. Organizational Identity
-1. Entities in the Network
-   1. Organizations
-   1. Ethereum Accounts
-   1. Nodes
-   1. Smart Contracts
-   1. Decentralized Applications (DApps)
-   1. Application Instances
-   1. Shared Applications
-   1. End Users
-1. Establishing Identity
-   1. Domains of Trust
-   1. Trust Anchors
-      1. Public Key Infrastructure (PKI)
-      1. Oracles
-   1. Trust on First Use (TOFU)
-   1. Enhancing TOFU with Policy
-   1. Hierarchical Deterministic (HD) Wallets
-1. Permissioning
-   1. Consensus
-   1. Network Ingress
-   1. Transaction Submission
-   1. Smart Contract Creation
-1. Identity Manager Component 
+<!-- TOC -->
+
+- [Identity and Permissioning](#identity-and-permissioning)
+    - [Table of Contents](#table-of-contents)
+    - [Types of Identities](#types-of-identities)
+        - [Organizations](#organizations)
+        - [Individuals](#individuals)
+    - [Technical Components Holding Identities](#technical-components-holding-identities)
+        - [Nodes](#nodes)
+                - [Externally Owned Accounts Managed by Nodes](#externally-owned-accounts-managed-by-nodes)
+        - [Smart Contracts](#smart-contracts)
+            - [Private Smart Contracts](#private-smart-contracts)
+        - [Decentralized Applications (DApps)](#decentralized-applications-dapps)
+        - [Application Instances](#application-instances)
+        - [Shared Applications](#shared-applications)
+                - [Trusted Execution Environments](#trusted-execution-environments)
+                - [Independent Third Parties](#independent-third-parties)
+        - [End Users](#end-users)
+        - [Devices](#devices)
+    - [Establishing Identity](#establishing-identity)
+        - [Domains of Trust](#domains-of-trust)
+        - [Trust Anchors](#trust-anchors)
+                - [Public Key Infrastructure (PKI)](#public-key-infrastructure-pki)
+                - [Oracles](#oracles)
+        - [Trust on First Use (TOFU)](#trust-on-first-use-tofu)
+        - [Enhancing TOFU with Policy](#enhancing-tofu-with-policy)
+        - [Hierarchical Deterministic (HD) Wallets](#hierarchical-deterministic-hd-wallets)
+    - [Permissioning](#permissioning)
+        - [Roles](#roles)
+        - [Consensus](#consensus)
+        - [Network Ingress](#network-ingress)
+        - [Transaction Submission](#transaction-submission)
+        - [Smart Contract Creation](#smart-contract-creation)
+    - [Identity Manager Component](#identity-manager-component)
+        - [Identity Manager Responsibilities](#identity-manager-responsibilities)
+        - [Example Behavior of a PKI Validator](#example-behavior-of-a-pki-validator)
+        - [Example Behavior of a TOFU Validator](#example-behavior-of-a-tofu-validator)
+    - [Policy Decision Point (PDP) Component](#policy-decision-point-pdp-component)
+
+<!-- /TOC -->
 
 ## Types of Identities
 
-Entities that exist within an Enterprise Ethereum network can be largely categorized as **Individual** and **Organizational** identities. An organizational identity is a collection of individual identities that are endorsed by a trusted authority that can vouch for the validity of the individual identity's organizational association. Different kinds of endorsement by the trusted authority will be described in details.
+Entities that exist within an Enterprise Ethereum network can be largely categorized as **Individual** and **Organizational** identities.
+
+In individual identity refers to a single technical component, or individual user.
+
+An organizational identity is a collection of individual identities that are endorsed by a trusted authority that can vouch for the validity of the individual identity's organizational association. Different kinds of endorsement by the trusted authority are described in the [Establishing Identity](#establishing-identity) section.
 
 ### Organizations
 
@@ -62,7 +80,7 @@ A permissioned Enterprise Ethereum network exists to provide a shared ledger bet
 
 Organizations **must** provide a way to establish the identity of other entities that they own, a.k.a a **trust anchor**, via some hierarchical system of trust as discussed later in this document.
 
-Organizations **will** be held accountable for the actions of the individual identities that are endorsed by the organization's trust anchor.
+Organizations **shall** be held accountable for the actions of the individual identities that are endorsed by the organization's trust anchor.
 
 Organizations **should** appropriately secure ingress into and out of the ethereum network. But every node in the network **must always** validate incoming requests from other nodes via the p2p network based on the permissioning mechanism.
 
@@ -72,13 +90,13 @@ Organizations **should** appropriately secure ingress into and out of the ethere
 
 An individual identity in an Enterprise Ethereum network represents a member of an organization. In the context of today's cryptography, an individual identity is a key pair, or [an ethereum Externally Owned Account](https://github.com/ethereum/wiki/wiki/White-Paper#ethereum-accounts). It is used for digital signing and encryption purposes. An organization does not hold keys itself but instead designate individual identities as members who then hold the keys. An organization can designate certain individuals to have special roles that are established in the consortium, such as a blockchain administrator of the organization, which may be required to carry out certain highly privileged operations such as inviting other organizations or accepting an invitation on behalf of the organization.
 
-Roles can be established using identity attributes, which will be discussed in more details.
+Roles can be established using identity attributes, which are discussed in more detail in the [Roles](#roles) section.
 
-An individual identity proves its organizations association through the endorsement of the trust anchor. The form of the proof is dependent on the trust system employed by the network. For example, if the network uses Public Key Infrastructure (PKI) then the proof is presented in the form of a public certificate signed by the organization's Certificate Authority (CA). The organization's CA must have been established as a trust anchor in the network apriori.
+An individual identity proves its organizations association through the endorsement of the trust anchor. The form of the proof is dependent on the trust system employed by the network. For example, if the network uses Public Key Infrastructure (PKI) then the proof is presented in the form of a public certificate signed by the organization's Certificate Authority (CA). The organization's CA **shall** already have been established as a trust anchor in the network.
 
-. In itself an ethereum account does not represent any form of identity. It is an address where asymmetric cryptography **shall** ensure only the holder of the associated private key is able to submit transactions from that address. In order to establish the identity associated with an account, some commonly agreed root of trust **shall** be established between all participants in the network.
+In itself an ethereum account does not represent any form of identity. It is an address where asymmetric cryptography **shall** ensure only the holder of the associated private key is able to submit transactions from that address. In order to establish the identity associated with an account, some commonly agreed root of trust **shall** be established between all participants in the network.
 
-A number of approaches to establishing identities, and linking an identity to an ethereum account are discussed later in this document.
+A number of approaches to establishing identities, and linking an identity to an ethereum account are discussed later in the [Establishing Identity](#establishing-identity) section.
 
 ## Technical Components Holding Identities
 
@@ -94,7 +112,7 @@ All nodes **must** have security in the form of encryption (TLS) and access cont
 
 All nodes **should** have TLS with their applications, and **may** choose to use access control based on digital signatures or other means of authentication such as OAuth.
 
-> The relationship between organization and node identities, and the formation of consensus for mining new blocks is discussed later in this document.
+> The relationship between organization and node identities, and the formation of consensus for mining new blocks is discussed further in the [Consensus](#consensus) section.
 
 As well as maintaining a copy of a ledger, nodes are the gateways by which external transactions are submitted into the network. Nodes **can** expose both IPC and Network interfaces for the submission of transactions into the network.
 
@@ -104,12 +122,11 @@ Nodes **may** hold the private keys of multiple Ethereum accounts, in order to s
 
 As such the node **can** provide a point of identity aggregation and/or masking, where multiple external identities are able to submit transactions into the network that result in the use of the same ethereum account.
 
-[**Suggest removing this section, smart contract isn't a good place to hold indentities as it's distributed as a shared component among participants**]
 ### Smart Contracts
 
-Once deployed a smart contract is assigned an ethereum account address, which **can** be linked to an identity via the approaches discussed in this document. Smart contracts can then submit transactions to other smart contracts, and can use state to prevent access to the smart contract from unauthenticated addresses, as long as the state required to establish the identity of the transaction submitter is available on the blockchain.
+Once deployed a smart contract is assigned an ethereum account address, which **can** be linked to an identity via the approaches discussed in this document. Smart contracts can then submit transactions to other smart contracts.
 
-As such a smart contracts **can** provide a point of identity aggregation, and **may** contain logic and interfaces to allow management of that identity aggregation. Common use cases include recovery of identity in the case that the private keys for an external account are lost, or the establishment and management of an organizational identity.
+As such a smart contracts **can** contribute to management of identities. An example use cases is recovery of identity in the case that the private keys for an external account are lost.
 
 #### Private Smart Contracts
 
@@ -117,7 +134,9 @@ In a permissioned Enterprise Ethereum network with a private transaction manager
 
 ### Decentralized Applications (DApps)
 
-Decentralized applications (DApps) are the combination of multiple application instances that **may** be implemented and/or hosted by different organizations, and a set of smart contracts with well defined programming interfaces that hold common state. Assigning an identity to the overall decentralized application is beyond the the scope of this document. However, the individual application instances and smart contracts that participate in the overall DApp are considered.
+Decentralized applications (DApps) are the combination of multiple application instances that **may** be implemented and/or hosted by different organizations, and a set of smart contracts with well defined programming interfaces that hold common state.
+
+Assigning an identity to the overall decentralized application is beyond the the scope of this document. However, the individual application instances and smart contracts that participate in the overall DApp are considered.
 
 ### Application Instances
 
@@ -193,8 +212,7 @@ If a suitable third party exists who's identity **can** be trusted by all partie
 
 ##### Oracles
 
-[**why would this be a problem? validating a certiciate can always be done deterministically in a distributed system. May need to discuss this a bit more**]
-The decentralized nature of the ethereum ecosystem, and permissioned ethereum networks, **may** make the approach of exploiting the existing trusted certificate authorities in the centralized PKI infrastructure unsuitable for some networks. In these cases a decentralized hierarchy of identity could be managed either on the permissioned chain itself, or in the public ethereum ecosystem.
+An alternative to exploiting existing PKI Certificate Authorities that exist on the internet, is to build a set of Oracles on either the permissioned Enterprise Ethereum network, or within the public Ethereum ecosystem. These Oracles **may** be owned by a trusted party that performs validation of identity. Or these Oracles **may** exploit decentralized algorithms to establish identity.
 
 In such a system x.509 certificates **can** continue to be used as the technology for encoding and signing identity, while the certificate authorities are replaced with Smart Contracts that govern the lifecycle of trust of those certificates.
 
